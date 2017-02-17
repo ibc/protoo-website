@@ -1,189 +1,175 @@
 ---
-title: API Reference
+title: protoo
 
 language_tabs:
-  - shell
-  - ruby
-  - python
   - javascript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a>
-
-includes:
-  - errors
+  - <a href='https://github.com/ibc/protoo'>Source Code at GitHub</a>
 
 search: true
 ---
 
-# Introduction
+# protoo
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+**protoo** is a minimalist and extensible Node.js signaling framework for Real-Time Communication applications.
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+It provides both a server and a client Node.js modules to build multi-party Real-Time applications. Its primary purpose is to provide Web applications with the ability to easily add group chat, presence and multimedia capabilities.
 
-This example API documentation page was created with [Slate](https://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
+**protoo** defines a signaling protocol based on JSON requests and responses. It is up to the application to define and extend the signaling protocol and the content of requests and responses in order to accomplish the desired feature set.
 
-# Authentication
 
-> To authorize, use this code:
+# protoo-server
 
-```ruby
-require 'kittn'
+The **protoo** server side Node.js module.
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
+
+## Installation
+
+> Within your server side Node.js application:
+
+```bash
+$ npm install --save protoo-server
 ```
 
-```python
-import kittn
+Install the [protoo-server](https://www.npmjs.com/package/protoo-server) NPM package into your Node.js server side application.
 
-api = kittn.authorize('meowmeowmeow')
-```
 
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
+## API
 
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
+const protooServer = require('protoo-server');
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
+### Room
 
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+let room = new protooServer.Room();
 ```
 
-> The above command returns JSON structured like this:
+A `Room` represents a multi-party communication context.
 
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
 
-This endpoint retrieves all kittens.
+#### `closed`
 
-### HTTP Request
+Boolean indicating whether the room is closed.
 
-`GET http://example.com/api/kittens`
 
-### Query Parameters
+#### `close()`
 
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+Close the room. All the peers within this room will be disconnected.
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
 
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
+#### `createPeer(peerId, transport)`
 
 ```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
+let peer = room.createPeer('alice', transport);
 ```
 
-> The above command returns JSON structured like this:
+Creates a peer within this room. It returns the `Peer` instance.
 
-```json
+Parameter    | Description
+------------ | ------------------------------
+peerId       | Unique string identifier for the peer.
+transport    | A `WebSocketTransport` instance.
+
+
+#### `spread(method, data, excluded)`
+
+```javascript
+room.spread('notification', data);
+```
+
+Send a request to all the peers in the room.
+
+Parameter    | Description
+------------ | ------------------------------
+method       | Request method string.
+data         | Request data object.
+excluded     | Optional array of `Peer` instances or `peerId` string values who won't receive the request.
+
+
+### WebSocketServer
+
+```javascript
+let options =
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
+  maxReceivedFrameSize     : 960000, // 960 KBytes.
+  maxReceivedMessageSize   : 960000,
+  fragmentOutgoingMessages : true,
+  fragmentationThreshold   : 960000
+};
+
+let server = new WebSocketServer.Room(httpServer, options);
 ```
 
-This endpoint retrieves a specific kitten.
+A `WebSocketServer` listens for WebSocket connections from clients.
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+Parameter    | Description
+------------ | ------------------------------
+httpServer   | A Node.js `http.Server` or `https.Server` object.
+options      | Options for [websocket.WebSocketServer](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketServer.md#server-config-options).
 
-### HTTP Request
+<aside class='success'>
+It's up to the application to set the <code>http.Server</code> or <code>https.Server</code> and call <code>listen()</code> on it.
+<br><br>
+In this way, the <code>http.Server</code> or <code>https.Server</code> can also be used for pure HTTP purposes by sharing it with <a href='http://expressjs.com/'>Express</a> or any other Node.js HTTP framework.
+</aside>
 
-`GET http://example.com/kittens/<ID>`
 
-### URL Parameters
+#### `stop()`
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
+Unmounts the WebSocket server so no more WebSocket connections will take place.
+
+<aside class='notice'>
+When <code>stop()</code> is called, the underlying Node.js <code>http.Server</code> or <code>https.Server</code> is not closed.
+</aside>
+
+
+#### `on('connectionrequest', listener)`
+
+```javascript
+server.on('connectionrequest', (info, accept, reject) =>
+{
+  // The app inspects the `info` object and decides whether to accept the
+  // connection or not.  
+  if (something)
+  {
+    let transport = accept();
+
+    // The app chooses a `peerId` and creates a peer within a specific room.
+    let peer = room.createPeer('bob', transport);
+  }
+  else
+  {
+    reject(403, 'Not Allowed');
+  }
+});
+```
+
+Event fired when a WebSocket client attempts to connect to the WebSocket server. The `listener` function is called with the following parameters:
+
+Parameter    | Description
+------------ | ------------------------------
+info         | An object with information about the connection attempt.
+accept       | Function to be called by the application if the connection must be accepted.
+reject       | Function to be called by the application if the connection must be rejected.
+
+The `info` object has the following fields:
+
+Field        | Description
+------------ | ------------------------------
+request      | The Node.js `http.IncomingMessage` object representing the received HTTP request during the Websocket handshake.
+origin       | The value of the `Origin` header in the HTTP request.
+socket       | The Node.js `net.Socket` object.
+
+The `accept` function returns a `WebSocketTransport` instance.
+
+The `reject` function has the following parameters:
+
+Parameter    | Default    | Description
+------------ | ---------- | -----------------------
+code         | 403        | The HTTP response status code.
+reason       | 'Rejected' | The HTTP response status reason string.
 

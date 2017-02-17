@@ -67,6 +67,7 @@ html, body {
   bottom: 0;
   width: $nav-width;
   background-color: $nav-bg;
+  background-image: linear-gradient(to bottom, $nav-bg 0%, $nav-bg-bottom 50%);
   font-size: 13px;
   font-weight: bold;
 
@@ -79,17 +80,29 @@ html, body {
     }
   }
 
-  // This is the logo at the top of the ToC
-  &>img {
-    display: block;
-    max-width: 100%;
+  &>.logo {
+    padding: 20px 0;
+    text-align: center;
+
+    > h1 {
+      margin-right: 0.15em;
+      font-family: "Poiret One";
+      font-size: 4.5rem;
+      font-weight: normal;
+      letter-spacing: -.05em;
+      color: #fff;
+
+      span.double-o {
+        letter-spacing: -0.1em;
+      }
+    }
   }
 
   &>.search {
     position: relative;
 
     input {
-      background: $nav-bg;
+      background: transparent;
       border-width: 0 0 1px 0;
       border-color: $search-box-border-color;
       padding: 6px 0 6px 20px;
@@ -193,6 +206,19 @@ html, body {
     @include embossed-bg;
     &>li:last-child {
       box-shadow: none; // otherwise it'll overflow out of the subheader
+    }
+
+    .tocify-subheader {
+      .tocify-item>a {
+        padding-left: $nav-padding + $nav-indent * 1.75;
+      }
+
+      .tocify-subheader {
+        .tocify-item>a {
+          padding-left: $nav-padding + $nav-indent * 3;
+          font-size: 11px;
+        }
+      }
     }
   }
 
@@ -458,7 +484,7 @@ html, body {
     background-color: rgba(0,0,0,0.05);
     padding: 3px;
     border-radius: 3px;
-    @extend %break-words;
+    //@extend %break-words;
     @extend %code-font;
   }
 

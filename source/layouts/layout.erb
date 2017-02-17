@@ -20,6 +20,9 @@ under the License.
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/android-icon-192x192.png">
+    <link href="http://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
     <title><%= current_page.data.title || "API Documentation" %></title>
 
     <style>
@@ -42,7 +45,9 @@ under the License.
       </span>
     </a>
     <div class="tocify-wrapper">
-      <%= image_tag "logo.png" %>
+      <div class="logo">
+        <h1 class="toc-ignore">prot<span class="double-o">oo</span></h1>
+      </div>
       <% if language_tabs.any? %>
         <div class="lang-selector">
           <% language_tabs.each do |lang| %>
