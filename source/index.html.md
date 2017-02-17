@@ -26,8 +26,6 @@ The **protoo** server side Node.js module.
 
 ## Installation
 
-> Within your server side Node.js application:
-
 ```bash
 $ npm install --save protoo-server
 ```
@@ -51,14 +49,14 @@ let room = new protooServer.Room();
 A `Room` represents a multi-party communication context.
 
 
+#### `peers`
+
+Returns an array with all the `Peer` instances in the room.
+
+
 #### `closed`
 
 Boolean indicating whether the room is closed.
-
-
-#### `close()`
-
-Close the room. All the peers within this room will be disconnected.
 
 
 #### `createPeer(peerId, transport)`
@@ -88,6 +86,11 @@ Parameter    | Description
 method       | Request method string.
 data         | Request data object.
 excluded     | Optional array of `Peer` instances or `peerId` string values who won't receive the request.
+
+
+#### `close()`
+
+Close the room. All the peers within this room will be disconnected.
 
 
 ### WebSocketServer
@@ -173,3 +176,9 @@ Parameter    | Default    | Description
 code         | 403        | The HTTP response status code.
 reason       | 'Rejected' | The HTTP response status reason string.
 
+
+### WebSocketTransport
+
+Created when calling `accept()` within the `connectionrequest` event of the `WebSocketServer`, it represents an established WebSocket connection with a client.
+
+No public API is exposed.
