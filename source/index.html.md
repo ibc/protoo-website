@@ -245,7 +245,7 @@ excluded     | Optional array of `Peer` instances or `peerId` string values who 
 
 #### `close()`
 
-Closes the room and emits `close` event. All the peers within this room will be disconnected.
+Closes the room and emits `close` event. All the peers within this room will also be closed.
 
 
 #### `on('close', listener)`
@@ -255,7 +255,7 @@ Event fired when the room is closed.
 
 ### Peer
 
-A `Peer` represents a remove client connected to a `Room`.
+A `Peer` represents a remote client connected to a `Room`.
 
 
 #### `id`
