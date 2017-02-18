@@ -14,12 +14,15 @@ search: true
 
 **protoo** is a minimalist and extensible Node.js signaling framework for multi-party Real-Time Communication applications.
 
-It provides both a server Node.js module and a client JavaScript library. Its primary purpose is to provide Web applications with the ability to easily add group chat, presence and multimedia capabilities.
+It provides both a server side Node.js module and a client side JavaScript library. Its primary purpose is to provide applications with the ability to easily add group chat, presence and multi-party multimedia capabilities.
+
+
+## Messages
 
 **protoo** defines a signaling protocol based on JSON requests and responses. It is up to the application to define and extend the signaling protocol and the content of requests and responses in order to accomplish the desired feature set.
 
 
-## Request
+### Request
 
 ```javascript
 {
@@ -44,7 +47,7 @@ method       | A custom string representing the request method.
 data         | An object with custom data.
 
 
-## Response
+### Response
 
 > Success response
 
