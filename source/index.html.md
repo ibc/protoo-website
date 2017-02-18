@@ -10,7 +10,7 @@ toc_footers:
 search: true
 ---
 
-# protoo
+# prot<span class="double-o">oo</span>
 
 **protoo** is a minimalist and extensible Node.js signaling framework for multi-party Real-Time Communication applications.
 
@@ -23,6 +23,8 @@ It provides both a server side Node.js module and a client side JavaScript libra
 
 
 ### Request
+
+A **protoo** request is a JSON message.
 
 ```javascript
 {
@@ -37,8 +39,6 @@ It provides both a server side Node.js module and a client side JavaScript libra
 }
 ```
 
-A **protoo** request is a JSON message.
-
 Field        | Description
 ------------ | ------------------------------
 request      | Must be `true`.
@@ -48,6 +48,8 @@ data         | An object with custom data.
 
 
 ### Response
+
+A **protoo** response is a JSON message associated to a **protoo** request.
 
 > Success response
 
@@ -74,8 +76,6 @@ data         | An object with custom data.
 }
 ```
 
-A **protoo** response is a JSON message associated to a **protoo** request.
-
 Field        | Description
 ------------ | ------------------------------
 response     | Must be `true`.
@@ -93,11 +93,11 @@ The **protoo** server side Node.js module.
 
 ## Installation
 
+Install the [protoo-server](https://www.npmjs.com/package/protoo-server) NPM package into your Node.js server side application.
+
 ```bash
 $ npm install --save protoo-server
 ```
-
-Install the [protoo-server](https://www.npmjs.com/package/protoo-server) NPM package into your Node.js server side application.
 
 
 ## API
@@ -108,6 +108,8 @@ const protooServer = require('protoo-server');
 
 
 ### WebSocketServer
+
+A `WebSocketServer` listens for WebSocket connections from clients.
 
 ```javascript
 let options =
@@ -120,8 +122,6 @@ let options =
 
 let server = new WebSocketServer.Room(httpServer, options);
 ```
-
-A `WebSocketServer` listens for WebSocket connections from clients.
 
 Parameter    | Description
 ------------ | ------------------------------
@@ -146,6 +146,8 @@ When <code>stop()</code> is called, the underlying Node.js <code>http.Server</co
 
 #### `on('connectionrequest', listener)`
 
+Event fired when a WebSocket client attempts to connect to the WebSocket server. The `listener` function is called with the following parameters:
+
 ```javascript
 server.on('connectionrequest', (info, accept, reject) =>
 {
@@ -164,8 +166,6 @@ server.on('connectionrequest', (info, accept, reject) =>
   }
 });
 ```
-
-Event fired when a WebSocket client attempts to connect to the WebSocket server. The `listener` function is called with the following parameters:
 
 Parameter    | Description
 ------------ | ------------------------------
@@ -200,11 +200,11 @@ No public API is exposed.
 
 ### Room
 
+A `Room` represents a multi-party communication context.
+
 ```javascript
 let room = new protooServer.Room();
 ```
-
-A `Room` represents a multi-party communication context.
 
 
 #### `peers`
@@ -219,11 +219,11 @@ Boolean indicating whether the room is closed.
 
 #### `createPeer(peerId, transport)`
 
+Creates a peer within this room. It returns the `Peer` instance.
+
 ```javascript
 let peer = room.createPeer('alice', transport);
 ```
-
-Creates a peer within this room. It returns the `Peer` instance.
 
 Parameter    | Description
 ------------ | ------------------------------
@@ -233,11 +233,11 @@ transport    | A `WebSocketTransport` instance.
 
 #### `spread(method, data, excluded)`
 
+Send a request to all the peers in the room.
+
 ```javascript
 room.spread('notification', data);
 ```
-
-Send a request to all the peers in the room.
 
 Parameter    | Description
 ------------ | ------------------------------
@@ -273,6 +273,8 @@ Boolean indicating whether the peer is closed.
 
 #### `send(method, data)`
 
+Send a request to the peer. It returns a Promise resolving to the `data` object field of the response (if successful).
+
 ```javascript
 peer.send('chicken', { foo: 'bar' })
   .then((data) =>
@@ -284,8 +286,6 @@ peer.send('chicken', { foo: 'bar' })
     console.error('error response');
   });
 ```
-
-Send a request to the peer. It returns a Promise resolving to the `data` object field of the response (if successful).
 
 Parameter    | Description
 ------------ | ------------------------------
@@ -300,6 +300,8 @@ Closes the peer and its underlying transport, and emits `close` event.
 
 #### `on('request', listener)`
 
+Event fired when a request is received from the peer. The `listener` function is called with the following parameters:
+
 ```javascript
 peer.on('request', (accept, reject) =>
 {
@@ -309,8 +311,6 @@ peer.on('request', (accept, reject) =>
     reject(400, 'Not Here');
 });
 ```
-
-Event fired when a request is received from the peer. The `listener` function is called with the following parameters:
 
 Parameter    | Description
 ------------ | ------------------------------
@@ -323,7 +323,6 @@ Parameter    | Default    | Description
 ------------ | ---------- | -----------------------
 data         | `{}`       | The `data` object field of the response.
 
-
 The `reject` function has the following parameters:
 
 Parameter    | Default    | Description
@@ -335,3 +334,32 @@ errorReason  |            | Error text description.
 #### `on('close', listener)`
 
 Event fired when the peer is closed by calling `close()` on it, or when the underlying transport is remotely closed.
+
+
+# protoo-client
+
+The **protoo** client side JavaScript library.
+
+
+## Installation
+
+> Using NPM
+
+```bash
+$ npm install --save protoo-client
+```
+
+> Using Bower
+
+```bash
+$ bower install protoo-client
+```
+
+
+## API
+
+```javascript
+const protooClient = require('protoo-client');
+```
+
+*TBD*
