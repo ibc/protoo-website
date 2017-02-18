@@ -12,11 +12,75 @@ search: true
 
 # protoo
 
-**protoo** is a minimalist and extensible Node.js signaling framework for Real-Time Communication applications.
+**protoo** is a minimalist and extensible Node.js signaling framework for multi-party Real-Time Communication applications.
 
-It provides both a server and a client Node.js modules to build multi-party Real-Time applications. Its primary purpose is to provide Web applications with the ability to easily add group chat, presence and multimedia capabilities.
+It provides both a server Node.js module and a client JavaScript library. Its primary purpose is to provide Web applications with the ability to easily add group chat, presence and multimedia capabilities.
 
 **protoo** defines a signaling protocol based on JSON requests and responses. It is up to the application to define and extend the signaling protocol and the content of requests and responses in order to accomplish the desired feature set.
+
+
+## Request
+
+```javascript
+{
+  request : true,
+  id      : 'kj3487asjh',
+  method  : 'chatmessage',
+  data    :
+  {
+    type  : 'text',
+    value : 'Hi there!'
+  }
+}
+```
+
+A **protoo** request is a JSON message.
+
+Field        | Description
+------------ | ------------------------------
+request      | Must be `true`.
+id           | A string identifier to match its associated response.
+method       | A custom string representing the request method.
+data         | An object with custom data.
+
+
+## Response
+
+> Success response
+
+```javascript
+{
+  response : true,
+  id       : 'kj3487asjh',
+  ok       : true,
+  data     :
+  {
+    foo : 'lalala'
+  }
+}
+```
+
+> Error response
+
+```javascript
+{
+  response    : true,
+  id          : 'kj3487asjh',
+  errorCode   : 123,
+  errorReason : 'Something failed'
+}
+```
+
+A **protoo** response is a JSON message associated to a **protoo** request.
+
+Field        | Description
+------------ | ------------------------------
+response     | Must be `true`.
+id           | A string identifier matching its associated request.
+ok           | `true` if a success response.
+data         | An object with custom data (just for success responses).
+errorCode    | Numeric error code up to the application (just for error responses).
+errorReason  | Descriptive error text up to the application (just for error responses).
 
 
 # protoo-server
@@ -38,59 +102,6 @@ Install the [protoo-server](https://www.npmjs.com/package/protoo-server) NPM pac
 ```javascript
 const protooServer = require('protoo-server');
 ```
-
-
-### Room
-
-```javascript
-let room = new protooServer.Room();
-```
-
-A `Room` represents a multi-party communication context.
-
-
-#### `peers`
-
-Returns an array with all the `Peer` instances in the room.
-
-
-#### `closed`
-
-Boolean indicating whether the room is closed.
-
-
-#### `createPeer(peerId, transport)`
-
-```javascript
-let peer = room.createPeer('alice', transport);
-```
-
-Creates a peer within this room. It returns the `Peer` instance.
-
-Parameter    | Description
------------- | ------------------------------
-peerId       | Unique string identifier for the peer.
-transport    | A `WebSocketTransport` instance.
-
-
-#### `spread(method, data, excluded)`
-
-```javascript
-room.spread('notification', data);
-```
-
-Send a request to all the peers in the room.
-
-Parameter    | Description
------------- | ------------------------------
-method       | Request method string.
-data         | Request data object.
-excluded     | Optional array of `Peer` instances or `peerId` string values who won't receive the request.
-
-
-#### `close()`
-
-Close the room. All the peers within this room will be disconnected.
 
 
 ### WebSocketServer
@@ -156,8 +167,8 @@ Event fired when a WebSocket client attempts to connect to the WebSocket server.
 Parameter    | Description
 ------------ | ------------------------------
 info         | An object with information about the connection attempt.
-accept       | Function to be called by the application if the connection must be accepted.
-reject       | Function to be called by the application if the connection must be rejected.
+accept       | Function to be called if the connection must be accepted.
+reject       | Function to be called if the connection must be rejected.
 
 The `info` object has the following fields:
 
@@ -182,3 +193,142 @@ reason       | 'Rejected' | The HTTP response status reason string.
 Created when calling `accept()` within the `connectionrequest` event of the `WebSocketServer`, it represents an established WebSocket connection with a client.
 
 No public API is exposed.
+
+
+### Room
+
+```javascript
+let room = new protooServer.Room();
+```
+
+A `Room` represents a multi-party communication context.
+
+
+#### `peers`
+
+Returns an array with all the `Peer` instances in the room.
+
+
+#### `closed`
+
+Boolean indicating whether the room is closed.
+
+
+#### `createPeer(peerId, transport)`
+
+```javascript
+let peer = room.createPeer('alice', transport);
+```
+
+Creates a peer within this room. It returns the `Peer` instance.
+
+Parameter    | Description
+------------ | ------------------------------
+peerId       | Unique string identifier for the peer.
+transport    | A `WebSocketTransport` instance.
+
+
+#### `spread(method, data, excluded)`
+
+```javascript
+room.spread('notification', data);
+```
+
+Send a request to all the peers in the room.
+
+Parameter    | Description
+------------ | ------------------------------
+method       | Request method string.
+data         | Request data object.
+excluded     | Optional array of `Peer` instances or `peerId` string values who won't receive the request.
+
+
+#### `close()`
+
+Closes the room and emits `close` event. All the peers within this room will be disconnected.
+
+
+#### `on('close', listener)`
+
+Event fired when the room is closed.
+
+
+### Peer
+
+A `Peer` represents a remove client connected to a `Room`.
+
+
+#### `id`
+
+The string identifier of the peer.
+
+
+#### `closed`
+
+Boolean indicating whether the peer is closed.
+
+
+#### `send(method, data)`
+
+```javascript
+peer.send('chicken', { foo: 'bar' })
+  .then((data) =>
+  {
+    console.log('success response received');
+  })
+  .catch((error) =>
+  {
+    console.error('error response');
+  });
+```
+
+Send a request to the peer. It returns a Promise resolving to the `data` object field of the response (if successful).
+
+Parameter    | Description
+------------ | ------------------------------
+method       | Request method string.
+data         | Request data object.
+
+
+#### `close()`
+
+Closes the peer and its underlying transport, and emits `close` event.
+
+
+#### `on('request', listener)`
+
+```javascript
+peer.on('request', (accept, reject) =>
+{
+  if (something)
+    accept({ foo: 'bar' });
+  else
+    reject(400, 'Not Here');
+});
+```
+
+Event fired when a request is received from the peer. The `listener` function is called with the following parameters:
+
+Parameter    | Description
+------------ | ------------------------------
+accept       | Function to be called if the request must be accepted.
+reject       | Function to be called if the request must be rejected.
+
+The `accept` function has the following parameters:
+
+Parameter    | Default    | Description
+------------ | ---------- | -----------------------
+data         | `{}`       | The `data` object field of the response.
+
+
+The `reject` function has the following parameters:
+
+Parameter    | Default    | Description
+------------ | ---------- | -----------------------
+errorCode    |            | The error numeric code.
+errorReason  |            | Error text description.
+
+
+#### `on('close', listener)`
+
+Event fired when the peer is closed by calling `close()` on it, or when the underlying transport is remotely closed.
