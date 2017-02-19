@@ -106,6 +106,11 @@ $ npm install --save protoo-server
 const protooServer = require('protoo-server');
 ```
 
+The top-level module exposes two JavaScript classes:
+
+* `WebSocketServer`
+* `Room`
+
 
 ### WebSocketServer
 
@@ -120,7 +125,7 @@ let options =
   fragmentationThreshold   : 960000
 };
 
-let server = new WebSocketServer.Room(httpServer, options);
+let server = new protooServer.WebSocketServer.Room(httpServer, options);
 ```
 
 Parameter    | Description
@@ -327,7 +332,7 @@ The `reject` function has the following parameters:
 
 Parameter    | Default    | Description
 ------------ | ---------- | -----------------------
-errorCode    |            | The error numeric code.
+errorCode    |            | Error numeric code.
 errorReason  |            | Error text description.
 
 
@@ -338,21 +343,18 @@ Event fired when the peer is closed by calling `close()` on it, or when the unde
 
 # protoo-client
 
-The **protoo** client side JavaScript library.
+The **protoo** client side JavaScript library. It runs in both the browser (by using <a href='http://browserify.org/'>Browserify</a>) and Node.js environments.
 
+<aside class='notice'>
+The library is written in JavaScript ES6 so, when running in the browser, <a href='https://babeljs.io/'>Babel</a> may be required depending on the browser.
+</aside>
 
 ## Installation
 
-> Using NPM
+Install the [protoo-client](https://www.npmjs.com/package/protoo-client) NPM package into your client side application.
 
 ```bash
 $ npm install --save protoo-client
-```
-
-> Using Bower
-
-```bash
-$ bower install protoo-client
 ```
 
 
@@ -362,4 +364,115 @@ $ bower install protoo-client
 const protooClient = require('protoo-client');
 ```
 
-*TBD*
+The top-level module exposes two JavaScript classes:
+
+* `WebSocketTransport`
+* `Peer`
+
+
+### WebSocketTransport
+
+A `WebSocketTransport` creates a WebSocket connection.
+
+```javascript
+
+let transport = new protooClient.WebSocketTransport('wss://example.org');
+```
+
+Parameter    | Description
+------------ | ------------------------------
+url          | WebSocket connection URL.
+options      | Options for [websocket.W3CWebSocket](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/W3CWebSocket.md#constructor) (all but `requestUrl`).
+
+<aside class='success'>
+The <code>options</code> parameter is just valid when using <strong>protoo-client</strong> in Node.js.
+</aside>
+
+
+### Peer
+
+A `Peer` represents a participant in a remote room.
+
+```javascript
+
+let peer = new protooClient.Peer(transport);
+```
+
+Parameter    | Description
+------------ | ------------------------------
+transport    | A `WebSocketTransport` instance.
+
+
+#### `closed`
+
+Boolean indicating whether the peer is closed.
+
+
+#### `send(method, data)`
+
+Send a request to the room. It returns a Promise resolving to the `data` object field of the response (if successful).
+
+```javascript
+peer.send('hello', { lalala: 'foo' })
+  .then((data) =>
+  {
+    console.log('success response received');
+  })
+  .catch((error) =>
+  {
+    console.error('error response');
+  });
+```
+
+Parameter    | Description
+------------ | ------------------------------
+method       | Request method string.
+data         | Request data object.
+
+
+#### `close()`
+
+Closes the peer and its underlying transport, and emits `close` event.
+
+
+#### `on('open', listener)`
+
+Event fired when the peer is connected to the room.
+
+
+#### `on('request', listener)`
+
+Event fired when a request is received from the room. The `listener` function is called with the following parameters:
+
+```javascript
+peer.on('request', (accept, reject) =>
+{
+  if (something)
+    accept({ foo: 'bar' });
+  else
+    reject(400, 'Not Here');
+});
+```
+
+Parameter    | Description
+------------ | ------------------------------
+accept       | Function to be called if the request must be accepted.
+reject       | Function to be called if the request must be rejected.
+
+The `accept` function has the following parameters:
+
+Parameter    | Default    | Description
+------------ | ---------- | -----------------------
+data         | `{}`       | The `data` object field of the response.
+
+The `reject` function has the following parameters:
+
+Parameter    | Default    | Description
+------------ | ---------- | -----------------------
+errorCode    |            | Error numeric code.
+errorReason  |            | Error text description.
+
+
+#### `on('close', listener)`
+
+Event fired when the peer is closed by calling `close()` on it, or when the underlying transport is remotely closed.
