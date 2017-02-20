@@ -273,7 +273,7 @@ Read-only string identifier of the peer.
 
 #### `data`
 
-Writable custom object p to the application.
+Writable custom object up to the application.
 
 ```javascript
 peer.data.foo = 'bar';
@@ -412,6 +412,17 @@ let peer = new protooClient.Peer(transport);
 Parameter    | Description
 ------------ | ------------------------------
 transport    | A `WebSocketTransport` instance.
+
+
+#### `data`
+
+Writable custom object up to the application.
+
+```javascript
+peer.data.bar = 1234;
+
+console.log(peer.data.bar);
+```
 
 
 #### `closed`
