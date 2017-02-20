@@ -158,7 +158,7 @@ server.on('connectionrequest', (info, accept, reject) =>
 {
   // The app inspects the `info` object and decides whether to accept the
   // connection or not.  
-  if (something)
+  if (something in info)
   {
     let transport = accept();
 
@@ -319,9 +319,9 @@ Closes the peer and its underlying transport, and emits `close` event.
 Event fired when a request is received from the peer. The `listener` function is called with the following parameters:
 
 ```javascript
-peer.on('request', (accept, reject) =>
+peer.on('request', (request, accept, reject) =>
 {
-  if (something)
+  if (something in request)
     accept({ foo: 'bar' });
   else
     reject(400, 'Not Here');
@@ -330,6 +330,7 @@ peer.on('request', (accept, reject) =>
 
 Parameter    | Description
 ------------ | ------------------------------
+request      | A **protoo** request.
 accept       | Function to be called if the request must be accepted.
 reject       | Function to be called if the request must be rejected.
 
@@ -467,9 +468,9 @@ Event fired when the peer is connected to the room.
 Event fired when a request is received from the room. The `listener` function is called with the following parameters:
 
 ```javascript
-peer.on('request', (accept, reject) =>
+peer.on('request', (request, accept, reject) =>
 {
-  if (something)
+  if (something in request)
     accept({ foo: 'bar' });
   else
     reject(400, 'Not Here');
@@ -478,6 +479,7 @@ peer.on('request', (accept, reject) =>
 
 Parameter    | Description
 ------------ | ------------------------------
+request      | A **protoo** request.
 accept       | Function to be called if the request must be accepted.
 reject       | Function to be called if the request must be rejected.
 
