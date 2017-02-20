@@ -214,7 +214,7 @@ let room = new protooServer.Room();
 
 #### `peers`
 
-Returns a ES6 `Iterator`with all the `Peer` instances in the room.
+Returns an array with all the `Peer` instances in the room.
 
 ```javascript
 for (let peer of room.peers)
