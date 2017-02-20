@@ -268,7 +268,18 @@ A `Peer` represents a remote client connected to a `Room`.
 
 #### `id`
 
-The string identifier of the peer.
+Read-only string identifier of the peer.
+
+
+#### `data`
+
+Writable custom object p to the application.
+
+```javascript
+peer.data.foo = 'bar';
+
+console.log(peer.data.foo);
+```
 
 
 #### `closed`
