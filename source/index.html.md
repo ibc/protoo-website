@@ -88,6 +88,8 @@ errorReason  | Descriptive error text up to the application (just for error resp
 
 # protoo-server
 
+<a href='https://npmjs.org/package/protoo-server'><img src='https://img.shields.io/npm/v/protoo-server.svg' alt=''></a>
+
 The **protoo** server side Node.js module.
 
 
@@ -361,6 +363,8 @@ Event fired when the peer is closed by calling `close()` on it, or when the unde
 
 
 # protoo-client
+
+<a href='https://npmjs.org/package/protoo-client'><img src='https://img.shields.io/npm/v/protoo-client.svg' alt=''></a>
 
 The **protoo** client side JavaScript library. It runs in both the browser (by using <a href='http://browserify.org/'>Browserify</a>) and Node.js environments.
 
