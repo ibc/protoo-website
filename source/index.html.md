@@ -233,16 +233,42 @@ Boolean indicating whether the room is closed.
 
 #### `createPeer(peerId, transport)`
 
-Creates a peer within this room. It returns the `Peer` instance.
+Creates a peer within this room. It returns a Promise resolving to the `Peer` instance. The Promise may be rejected if wrong params are given or there is already a peer with the same `peerId` in the room.
 
 ```javascript
-let peer = room.createPeer('alice', transport);
+room.createPeer('alice', transport)
+  .then((peer) =>
+  {
+    console.log('new peer created');
+  })
+  .catch((error) =>
+  {
+    console.error('error creating a peer: %o', error);
+  });
 ```
 
 Parameter    | Description
 ------------ | ------------------------------
 peerId       | Unique string identifier for the peer.
 transport    | A `WebSocketTransport` instance.
+
+
+#### `hasPeer(peerId)`
+
+Returns `true` if there is a peer in the room with the given `peerId`.
+
+Parameter    | Description
+------------ | ------------------------------
+peerId       | Peer Unique string identifier.
+
+
+#### `getPeer(peerId)`
+
+Returns the `Peer` instance with the given `peerId`, or `undefined` if not present in the room.
+
+Parameter    | Description
+------------ | ------------------------------
+peerId       | Peer Unique string identifier.
 
 
 #### `spread(method, data, excluded)`
