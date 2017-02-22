@@ -259,7 +259,7 @@ Returns `true` if there is a peer in the room with the given `peerId`.
 
 Parameter    | Description
 ------------ | ------------------------------
-peerId       | Peer Unique string identifier.
+peerId       | Peer string identifier.
 
 
 #### `getPeer(peerId)`
@@ -268,7 +268,7 @@ Returns the `Peer` instance with the given `peerId`, or `undefined` if not prese
 
 Parameter    | Description
 ------------ | ------------------------------
-peerId       | Peer Unique string identifier.
+peerId       | Peer string identifier.
 
 
 #### `spread(method, data, excluded)`
