@@ -233,7 +233,7 @@ Boolean indicating whether the room is closed.
 
 #### `createPeer(peerId, transport)`
 
-Creates a peer within this room. It returns a Promise resolving to the `Peer` instance. The Promise may be rejected if wrong params are given or there is already a peer with the same `peerId` in the room.
+Creates a peer within this room. It returns a Promise resolving to the `Peer` instance. The Promise may be rejected if wrong parameters are given or if there is already a peer with the same `peerId` in the room.
 
 ```javascript
 room.createPeer('alice', transport)
@@ -243,7 +243,7 @@ room.createPeer('alice', transport)
   })
   .catch((error) =>
   {
-    console.error('error creating a peer: %o', error);
+    console.error('error creating the peer: %s', error);
   });
 ```
 
