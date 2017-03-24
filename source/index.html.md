@@ -433,7 +433,9 @@ Parameter    | Description
 url          | WebSocket connection URL.
 options      | Includes the options for [websocket.W3CWebSocket](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/W3CWebSocket.md#constructor) (all but `requestUrl`) plus a `retry` parameter (see below).
 
-The `retry` parameters matches the `options` object given to [`retry.operation()`](https://www.npmjs.com/package/retry#retryoperationoptions) and controls the connection and reconnection attempts. If unset, it defaults to:
+The `retry` parameters matches the `options` object given to [`retry.operation()`](https://www.npmjs.com/package/retry#retryoperationoptions) and controls the connection and reconnection attempts.
+
+> If `options.retry` is not given, it defaults to the following values
 
 ```javascript
 {
