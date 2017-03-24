@@ -135,7 +135,7 @@ Parameter    | Description
 httpServer   | A Node.js `http.Server` or `https.Server` object.
 options      | Options for [websocket.WebSocketServer](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketServer.md#server-config-options).
 
-<aside class='success'>
+<aside class='notice'>
 It's up to the application to set the <code>http.Server</code> or <code>https.Server</code> and call <code>listen()</code> on it.
 <br><br>
 In this way, the <code>http.Server</code> or <code>https.Server</code> can also be used for pure HTTP purposes by sharing it with <a href='http://expressjs.com/'>Express</a> or any other Node.js HTTP framework.
@@ -431,9 +431,20 @@ let transport = new protooClient.WebSocketTransport('wss://example.org');
 Parameter    | Description
 ------------ | ------------------------------
 url          | WebSocket connection URL.
-options      | Options for [websocket.W3CWebSocket](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/W3CWebSocket.md#constructor) (all but `requestUrl`).
+options      | Includes the options for [websocket.W3CWebSocket](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/W3CWebSocket.md#constructor) (all but `requestUrl`) plus a `retry` parameter (see below).
 
-<aside class='success'>
+The `retry` parameters matches the `options` object given to [`retry.operation()`](https://www.npmjs.com/package/retry#retryoperationoptions) and controls the connection and reconnection attempts. If unset, it defaults to:
+
+```javascript
+{
+  retries    : 10,
+  factor     : 2,
+  minTimeout : 1 * 1000,
+  maxTimeout : 8 * 1000
+};
+```
+
+<aside class='notice'>
 The <code>options</code> parameter is just valid when using <strong>protoo-client</strong> in Node.js.
 </aside>
 
