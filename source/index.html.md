@@ -197,6 +197,12 @@ Parameter    | Default    | Description
 code         | 403        | The HTTP response status code.
 reason       | 'Rejected' | The HTTP response status reason string.
 
+or:
+
+Parameter    | Default    | Description
+------------ | ---------- | -----------------------
+error        |            | An `Error` instance.
+
 
 ### WebSocketTransport
 
@@ -374,6 +380,12 @@ Parameter    | Default    | Description
 errorCode    |            | Error numeric code.
 errorReason  |            | Error text description.
 
+or:
+
+Parameter    | Default    | Description
+------------ | ---------- | -----------------------
+error        |            | An `Error` instance.
+
 
 #### `on('close', listener)`
 
@@ -537,6 +549,12 @@ Parameter    | Default    | Description
 ------------ | ---------- | -----------------------
 errorCode    |            | Error numeric code.
 errorReason  |            | Error text description.
+
+or:
+
+Parameter    | Default    | Description
+------------ | ---------- | -----------------------
+error        |            | An `Error` instance.
 
 
 #### `on('close', listener)`
