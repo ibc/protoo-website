@@ -19,7 +19,7 @@ It provides both a server side Node.js module and a client side JavaScript libra
 
 ## Messages
 
-**protoo** defines a signaling protocol based on JSON requests and responses. It is up to the application to define and extend the signaling protocol and the content of requests and responses in order to accomplish the desired feature set.
+**protoo** defines a signaling protocol based on JSON requests, responses and notifications. It is up to the application to define and extend the signaling protocol and the content of those messages in order to accomplish the desired feature set.
 
 
 ### Request
@@ -84,6 +84,28 @@ ok           | `true` if a success response.
 data         | An object with custom data (just for success responses).
 errorCode    | Numeric error code up to the application (just for error responses).
 errorReason  | Descriptive error text up to the application (just for error responses).
+
+
+### Notification
+
+A **protoo** notification is a JSON message (so there is no associated response).
+
+```javascript
+{
+  notification : true,
+  method       : 'chatmessage',
+  data         :
+  {
+    foo : 'bar'
+  }
+}
+```
+
+Field        | Description
+------------ | ------------------------------
+notification | Must be `true`.
+method       | A custom string representing the notification method.
+data         | An object with custom data.
 
 
 # protoo-server
@@ -271,7 +293,7 @@ peerId       | Peer string identifier.
 
 #### `spread(method, data, excluded)`
 
-Send a request to all the peers in the room.
+Send a notification to all the peers in the room.
 
 ```javascript
 room.spread('notification', data);
@@ -279,8 +301,8 @@ room.spread('notification', data);
 
 Parameter    | Description
 ------------ | ------------------------------
-method       | Request method string.
-data         | Request data object.
+method       | Notification method string.
+data         | Notification data object.
 excluded     | Optional array of `Peer` instances or `peerId` string values who won't receive the request.
 
 
@@ -340,6 +362,24 @@ Parameter    | Description
 ------------ | ------------------------------
 method       | Request method string.
 data         | Request data object.
+
+
+#### `notify(method, data)`
+
+Send a notification to the peer. It returns a Promise that resolves if the notification was correctly sent.
+
+```javascript
+peer.notify('lalala', { foo: 'bar' })
+  .catch((error) =>
+  {
+    console.error('could not send notification');
+  });
+```
+
+Parameter    | Description
+------------ | ------------------------------
+method       | Notification method string.
+data         | Notification data object.
 
 
 #### `close()`
@@ -505,6 +545,24 @@ Parameter    | Description
 ------------ | ------------------------------
 method       | Request method string.
 data         | Request data object.
+
+
+#### `notify(method, data)`
+
+Send a notification to the room. It returns a Promise that resolves if the notification was correctly sent.
+
+```javascript
+peer.notify('lalala', { foo: 'bar' })
+  .catch((error) =>
+  {
+    console.error('could not send notification');
+  });
+```
+
+Parameter    | Description
+------------ | ------------------------------
+method       | Notification method string.
+data         | Notification data object.
 
 
 #### `close()`
