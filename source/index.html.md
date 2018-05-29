@@ -427,6 +427,22 @@ Parameter    | Default    | Description
 error        |            | An `Error` instance.
 
 
+#### `on('notification', listener)`
+
+Event fired when a notification is received from the peer. The `listener` function is called with the following parameters:
+
+```javascript
+peer.on('notification', (notification) =>
+{
+  // Do something.
+});
+```
+
+Parameter    | Description
+------------ | ------------------------------
+notification | A **protoo** notification.
+
+
 #### `on('close', listener)`
 
 Event fired when the peer is closed by calling `close()` on it, or when the underlying transport is remotely closed.
@@ -613,6 +629,22 @@ or:
 Parameter    | Default    | Description
 ------------ | ---------- | -----------------------
 error        |            | An `Error` instance.
+
+
+#### `on('notification', listener)`
+
+Event fired when a notification is received from the room. The `listener` function is called with the following parameters:
+
+```javascript
+peer.on('notification', (notification) =>
+{
+  // Do something.
+});
+```
+
+Parameter    | Description
+------------ | ------------------------------
+notification | A **protoo** notification.
 
 
 #### `on('close', listener)`
