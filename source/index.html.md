@@ -5,7 +5,7 @@ language_tabs:
   - javascript
 
 toc_footers:
-  - <a href='https://github.com/ibc/protoo'>Source Code at GitHub</a>
+  - <a href='https://github.com/versatica/protoo'>Source Code at GitHub</a>
 
 search: true
 ---
