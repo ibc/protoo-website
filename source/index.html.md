@@ -10,7 +10,7 @@ toc_footers:
 search: true
 ---
 
-# prot<span class="double-o">oo</span>
+# prot<span class="double-o">oo</span> v4
 
 **protoo** is a minimalist and extensible Node.js signaling framework for multi-party Real-Time Communication applications.
 
@@ -29,7 +29,7 @@ A **protoo** request is a JSON message.
 ```javascript
 {
   request : true,
-  id      : 'kj3487asjh',
+  id      : 12345678,
   method  : 'chatmessage',
   data    :
   {
@@ -42,7 +42,7 @@ A **protoo** request is a JSON message.
 Field        | Description
 ------------ | ------------------------------
 request      | Must be `true`.
-id           | A string identifier to match its associated response.
+id           | A number identifier to match its associated response.
 method       | A custom string representing the request method.
 data         | An object with custom data.
 
@@ -56,7 +56,7 @@ A **protoo** response is a JSON message associated to a **protoo** request.
 ```javascript
 {
   response : true,
-  id       : 'kj3487asjh',
+  id       : 12345678,
   ok       : true,
   data     :
   {
@@ -70,7 +70,8 @@ A **protoo** response is a JSON message associated to a **protoo** request.
 ```javascript
 {
   response    : true,
-  id          : 'kj3487asjh',
+  id          : 12345678,
+  ok          : false,
   errorCode   : 123,
   errorReason : 'Something failed'
 }
@@ -79,8 +80,8 @@ A **protoo** response is a JSON message associated to a **protoo** request.
 Field        | Description
 ------------ | ------------------------------
 response     | Must be `true`.
-id           | A string identifier matching its associated request.
-ok           | `true` if a success response.
+id           | A number identifier matching its associated request.
+ok           | `true` if a success response, `false` otherwise.
 data         | An object with custom data (just for success responses).
 errorCode    | Numeric error code up to the application (just for error responses).
 errorReason  | Descriptive error text up to the application (just for error responses).
@@ -130,10 +131,16 @@ $ npm install --save protoo-server
 const protooServer = require('protoo-server');
 ```
 
-The top-level module exposes two JavaScript classes:
+The top-level module exposes:
 
-* `WebSocketServer`
-* `Room`
+* `version` (String)
+* `WebSocketServer` (Class)
+* `Room` (Class)
+
+
+### version
+
+The package version.
 
 
 ### WebSocketServer
@@ -141,7 +148,7 @@ The top-level module exposes two JavaScript classes:
 A `WebSocketServer` listens for WebSocket connections from clients.
 
 ```javascript
-let options =
+const options =
 {
   maxReceivedFrameSize     : 960000, // 960 KBytes.
   maxReceivedMessageSize   : 960000,
@@ -149,18 +156,18 @@ let options =
   fragmentationThreshold   : 960000
 };
 
-let server = new protooServer.WebSocketServer.Room(httpServer, options);
+const server = new protooServer.WebSocketServer.Room(httpServer, options);
 ```
 
 Parameter    | Description
 ------------ | ------------------------------
 httpServer   | A Node.js `http.Server` or `https.Server` object.
-options      | Options for [websocket.WebSocketServer](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketServer.md#server-config-options).
+[options]    | Options for [websocket.WebSocketServer](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketServer.md#server-config-options).
 
 <aside class='notice'>
 It's up to the application to set the <code>http.Server</code> or <code>https.Server</code> and call <code>listen()</code> on it.
 <br><br>
-In this way, the <code>http.Server</code> or <code>https.Server</code> can also be used for pure HTTP purposes by sharing it with <a href='http://expressjs.com/'>Express</a> or any other Node.js HTTP framework.
+In this way, the <code>http.Server</code> or <code>https.Server</code> can also be used for pure HTTP purposes by sharing it with <a href='https://expressjs.com/'>Express</a> or any other Node.js HTTP framework.
 </aside>
 
 
@@ -173,9 +180,9 @@ When <code>stop()</code> is called, the underlying Node.js <code>http.Server</co
 </aside>
 
 
-#### `on('connectionrequest', listener)`
+#### `on('connectionrequest', fn(info, accept, reject))`
 
-Event fired when a WebSocket client attempts to connect to the WebSocket server. The `listener` function is called with the following parameters:
+Event fired when a WebSocket client attempts to connect to the WebSocket server.
 
 ```javascript
 server.on('connectionrequest', (info, accept, reject) =>
@@ -184,10 +191,10 @@ server.on('connectionrequest', (info, accept, reject) =>
   // connection or not.  
   if (something in info)
   {
-    let transport = accept();
+    const transport = accept();
 
     // The app chooses a `peerId` and creates a peer within a specific room.
-    let peer = room.createPeer('bob', transport);
+    const peer = async room.createPeer('bob', transport);
   }
   else
   {
@@ -217,7 +224,7 @@ The `reject` function has the following parameters:
 Parameter    | Default    | Description
 ------------ | ---------- | -----------------------
 code         | 403        | The HTTP response status code.
-reason       | 'Rejected' | The HTTP response status reason string.
+[reason]     | 'Rejected' | The HTTP response status reason string.
 
 or:
 
@@ -228,7 +235,7 @@ error        |            | An `Error` instance.
 
 ### WebSocketTransport
 
-Created when calling `accept()` within the `connectionrequest` event of the `WebSocketServer`, it represents an established WebSocket connection with a client.
+Created when calling `accept()` within the `connectionrequest` event of the `WebSocketServer`. It represents an established WebSocket connection with a client.
 
 No public API is exposed.
 
@@ -238,13 +245,13 @@ No public API is exposed.
 A `Room` represents a multi-party communication context.
 
 ```javascript
-let room = new protooServer.Room();
+const room = new protooServer.Room();
 ```
 
 
 #### `peers`
 
-Returns an array with all the `Peer` instances in the room.
+Returns an array with all the connected `Peer` instances in the room.
 
 ```javascript
 for (let peer of room.peers)
@@ -259,12 +266,12 @@ for (let peer of room.peers)
 Boolean indicating whether the room is closed.
 
 
-#### `createPeer(peerId, transport)`
+#### `async createPeer(peerId, transport)`
 
-Creates a peer within this room. It returns the new `Peer` instance. It may throw if wrong parameters are given or if there is already a peer with the same `peerId` in the room.
+Creates a `Peer` within this room. It resolves to the `Peer` instance. It rejects if wrong parameters are given or if there is already a peer with the same `peerId` in the room.
 
 ```javascript
-let peer = room.createPeer('alice', transport);
+const peer = await room.createPeer('alice', transport);
 ```
 
 Parameter    | Description
@@ -291,27 +298,12 @@ Parameter    | Description
 peerId       | Peer string identifier.
 
 
-#### `spread(method, data, excluded)`
-
-Send a notification to all the peers in the room.
-
-```javascript
-room.spread('notification', data);
-```
-
-Parameter    | Description
------------- | ------------------------------
-method       | Notification method string.
-data         | Notification data object.
-excluded     | Optional array of `Peer` instances or `peerId` string values who won't receive the request.
-
-
 #### `close()`
 
-Closes the room and emits `close` event. All the peers within this room will also be closed.
+Closes the room and emits `close` event. All the peers within this room will also be closed and their `close` event fired.
 
 
-#### `on('close', listener)`
+#### `on('close', fn())`
 
 Event fired when the room is closed.
 
@@ -342,44 +334,41 @@ console.log(peer.data.foo);
 Boolean indicating whether the peer is closed.
 
 
-#### `send(method, data)`
+#### `async request(method, [data])`
 
-Send a request to the peer. It returns a Promise resolving to the `data` object field of the response (if successful).
+Sends a **protoo** request to the peer. It resolves to the `data` object of the **protoo** response (if successful) or rejects if an error response is received (or any other kind of error happens).
 
 ```javascript
-peer.send('chicken', { foo: 'bar' })
-  .then((data) =>
-  {
-    console.log('success response received');
-  })
-  .catch((error) =>
-  {
-    console.error('error response');
-  });
+try
+{
+  const data = await peer.request('chicken', { foo: 'bar' });
+
+  console.log('got response data:', data);
+}
+catch (error)
+{
+  console.error('request failed:', error);
+}
 ```
 
 Parameter    | Description
 ------------ | ------------------------------
 method       | Request method string.
-data         | Request data object.
+[data]       | Request data object.
 
 
-#### `notify(method, data)`
+#### `async notify(method, [data])`
 
-Send a notification to the peer. It returns a Promise that resolves if the notification was correctly sent.
+Sends a **protoo** notification to the peer. It resolves if the notification was correctly sent, and rejects if the notification could not be sent.
 
 ```javascript
-peer.notify('lalala', { foo: 'bar' })
-  .catch((error) =>
-  {
-    console.error('could not send notification');
-  });
+peer.notify('lalala', { foo: 'bar' });
 ```
 
 Parameter    | Description
 ------------ | ------------------------------
 method       | Notification method string.
-data         | Notification data object.
+[data]       | Notification data object.
 
 
 #### `close()`
@@ -387,9 +376,9 @@ data         | Notification data object.
 Closes the peer and its underlying transport, and emits `close` event.
 
 
-#### `on('request', listener)`
+#### `on('request', fn(request, accept, reject))`
 
-Event fired when a request is received from the peer. The `listener` function is called with the following parameters:
+Event fired when a **protoo** request is received from the peer.
 
 ```javascript
 peer.on('request', (request, accept, reject) =>
@@ -411,14 +400,14 @@ The `accept` function has the following parameters:
 
 Parameter    | Default    | Description
 ------------ | ---------- | -----------------------
-data         | `{}`       | The `data` object field of the response.
+[data]       | `{}`       | The `data` object field of the response.
 
 The `reject` function has the following parameters:
 
-Parameter    | Default    | Description
------------- | ---------- | -----------------------
-errorCode    |            | Error numeric code.
-errorReason  |            | Error text description.
+Parameter     | Default    | Description
+------------- | ---------- | -----------------------
+errorCode     |            | Error numeric code.
+[errorReason] |            | Error text description.
 
 or:
 
@@ -427,9 +416,9 @@ Parameter    | Default    | Description
 error        |            | An `Error` instance.
 
 
-#### `on('notification', listener)`
+#### `on('notification', fn(notification))`
 
-Event fired when a notification is received from the peer. The `listener` function is called with the following parameters:
+Event fired when a **protoo** notification is received from the peer.
 
 ```javascript
 peer.on('notification', (notification) =>
@@ -443,20 +432,17 @@ Parameter    | Description
 notification | A **protoo** notification.
 
 
-#### `on('close', listener)`
+#### `on('close', fn())`
 
-Event fired when the peer is closed by calling `close()` on it, or when the underlying transport is remotely closed.
+Event fired when the peer is closed by calling `close()` on it, or when the underlying transport is remotely closed, or when the room is closed.
 
 
 # protoo-client
 
 <a href='https://npmjs.org/package/protoo-client'><img src='https://img.shields.io/npm/v/protoo-client.svg' alt=''></a>
 
-The **protoo** client side JavaScript library. It runs in both the browser (by using <a href='http://browserify.org/'>Browserify</a>) and Node.js environments.
+The **protoo** client side JavaScript library. It runs in both browser and Node.js environments.
 
-<aside class='notice'>
-The library is written in JavaScript ES6 so, when running in the browser, <a href='https://babeljs.io/'>Babel</a> may be required depending on the browser.
-</aside>
 
 ## Installation
 
@@ -475,8 +461,14 @@ const protooClient = require('protoo-client');
 
 The top-level module exposes two JavaScript classes:
 
-* `WebSocketTransport`
-* `Peer`
+* `version` (String)
+* `WebSocketTransport` (Class)
+* `Peer` (Class)
+
+
+### version
+
+The package version.
 
 
 ### WebSocketTransport
@@ -485,13 +477,13 @@ A `WebSocketTransport` creates a WebSocket connection.
 
 ```javascript
 
-let transport = new protooClient.WebSocketTransport('wss://example.org');
+const transport = new protooClient.WebSocketTransport('wss://example.org');
 ```
 
 Parameter    | Description
 ------------ | ------------------------------
 url          | WebSocket connection URL.
-options      | Includes the options for [websocket.W3CWebSocket](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/W3CWebSocket.md#constructor) (all but `requestUrl`) plus a `retry` parameter (see below).
+[options]    | Includes the options for [websocket.W3CWebSocket](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/W3CWebSocket.md#constructor) (all but `requestUrl`) plus a `retry` parameter (see below).
 
 The `retry` parameters matches the `options` object given to [`retry.operation()`](https://www.npmjs.com/package/retry#retryoperationoptions) and controls the connection and reconnection attempts.
 
@@ -507,7 +499,7 @@ The `retry` parameters matches the `options` object given to [`retry.operation()
 ```
 
 <aside class='notice'>
-The <code>options</code> parameter is just valid when using <strong>protoo-client</strong> in Node.js.
+The <code>options</code> parameters other than `retry` are just valid when using <strong>protoo-client</strong> in Node.js.
 </aside>
 
 
@@ -517,7 +509,7 @@ A `Peer` represents a participant in a remote room.
 
 ```javascript
 
-let peer = new protooClient.Peer(transport);
+const peer = new protooClient.Peer(transport);
 ```
 
 Parameter    | Description
@@ -541,44 +533,46 @@ console.log(peer.data.bar);
 Boolean indicating whether the peer is closed.
 
 
-#### `send(method, data)`
+#### `connected`
 
-Send a request to the room. It returns a Promise resolving to the `data` object field of the response (if successful).
+Boolean indicating whether the peer is connected.
+
+
+#### `async request(method, [data])`
+
+Sends a **protoo** request to the peer. It resolves to the `data` object of the **protoo** response (if successful) or rejects if an error response is received (or any other kind of error happens).
 
 ```javascript
-peer.send('hello', { lalala: 'foo' })
-  .then((data) =>
-  {
-    console.log('success response received');
-  })
-  .catch((error) =>
-  {
-    console.error('error response');
-  });
+try
+{
+  const data = await peer.request('chicken', { foo: 'bar' });
+
+  console.log('got response data:', data);
+}
+catch (error)
+{
+  console.error('request failed:', error);
+}
 ```
 
 Parameter    | Description
 ------------ | ------------------------------
 method       | Request method string.
-data         | Request data object.
+[data]       | Request data object.
 
 
-#### `notify(method, data)`
+#### `async notify(method, [data])`
 
-Send a notification to the room. It returns a Promise that resolves if the notification was correctly sent.
+Sends a **protoo** notification to the peer. It resolves if the notification was correctly sent, and rejects if the notification could not be sent.
 
 ```javascript
-peer.notify('lalala', { foo: 'bar' })
-  .catch((error) =>
-  {
-    console.error('could not send notification');
-  });
+peer.notify('lalala', { foo: 'bar' });
 ```
 
 Parameter    | Description
 ------------ | ------------------------------
 method       | Notification method string.
-data         | Notification data object.
+[data]       | Notification data object.
 
 
 #### `close()`
@@ -586,14 +580,43 @@ data         | Notification data object.
 Closes the peer and its underlying transport, and emits `close` event.
 
 
-#### `on('open', listener)`
+#### `on('open', fn())`
 
-Event fired when the peer is connected to the room.
+Event fired when the transport is connected.
 
 
-#### `on('request', listener)`
+#### `on('failed', fn(currentAttempt))`
 
-Event fired when a request is received from the room. The `listener` function is called with the following parameters:
+Event fired when the connection with the server fails (due to network errors, not running server, unreachable server address, etc).
+
+The peer will try to connect as many times as defined in its `retry` options. After those retries, the `close` event will fire.
+
+Parameter      | Description
+-------------- | ------------------------------
+currentAttempt | Reconnection attempt (starts with 1).
+
+
+
+#### `on('disconnected', fn())`
+
+Event fired when the established connection is abruptly closed. The peer will start the reconnection procedures as defined in its `retry` options.
+
+The peer will try to reconnect as many times as defined in its `retry` options. After those retries the <code>close</code> event will fire.
+
+<aside class='notice'>
+If <code>close()</code> was called in the server-side <code>room</code>, in the server-side <code>peer</code> or in this client-side <code>peer</code>, no reconnection attempts will take place.
+</aside>
+
+
+#### `on('close', fn())`
+
+Event fired when the peer is closed by calling `close()` on it, or when the underlying transport is remotely closed (via `room.close()` or `peer.close()` in server-side), or after all reconnection attempts fail.
+
+
+
+#### `on('request', fn(request, accept, reject))`
+
+Event fired when a **protoo** request is received from the room.
 
 ```javascript
 peer.on('request', (request, accept, reject) =>
@@ -615,14 +638,14 @@ The `accept` function has the following parameters:
 
 Parameter    | Default    | Description
 ------------ | ---------- | -----------------------
-data         | `{}`       | The `data` object field of the response.
+[data]       | `{}`       | The `data` object field of the response.
 
 The `reject` function has the following parameters:
 
-Parameter    | Default    | Description
------------- | ---------- | -----------------------
-errorCode    |            | Error numeric code.
-errorReason  |            | Error text description.
+Parameter     | Default    | Description
+------------- | ---------- | -----------------------
+errorCode     |            | Error numeric code.
+[errorReason] |            | Error text description.
 
 or:
 
@@ -631,9 +654,9 @@ Parameter    | Default    | Description
 error        |            | An `Error` instance.
 
 
-#### `on('notification', listener)`
+#### `on('notification', fn(notification))`
 
-Event fired when a notification is received from the room. The `listener` function is called with the following parameters:
+Event fired when a **protoo** notification is received from the room.
 
 ```javascript
 peer.on('notification', (notification) =>
@@ -645,8 +668,3 @@ peer.on('notification', (notification) =>
 Parameter    | Description
 ------------ | ------------------------------
 notification | A **protoo** notification.
-
-
-#### `on('close', listener)`
-
-Event fired when the peer is closed by calling `close()` on it, or when the underlying transport is remotely closed.
