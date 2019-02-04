@@ -10,7 +10,9 @@ toc_footers:
 search: true
 ---
 
-# prot<span class="double-o">oo</span> v4
+# prot<span class="double-o">oo</span>
+
+_Documentation for v4_
 
 **protoo** is a minimalist and extensible Node.js signaling framework for multi-party Real-Time Communication applications.
 
