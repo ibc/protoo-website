@@ -158,7 +158,7 @@ const options =
   fragmentationThreshold   : 960000
 };
 
-const server = new protooServer.WebSocketServer.Room(httpServer, options);
+const server = new protooServer.WebSocketServer(httpServer, options);
 ```
 
 Parameter    | Description
@@ -187,7 +187,7 @@ When <code>stop()</code> is called, the underlying Node.js <code>http.Server</co
 Event fired when a WebSocket client attempts to connect to the WebSocket server.
 
 ```javascript
-server.on('connectionrequest', (info, accept, reject) =>
+server.on('connectionrequest', async (info, accept, reject) =>
 {
   // The app inspects the `info` object and decides whether to accept the
   // connection or not.  
@@ -196,7 +196,7 @@ server.on('connectionrequest', (info, accept, reject) =>
     const transport = accept();
 
     // The app chooses a `peerId` and creates a peer within a specific room.
-    const peer = async room.createPeer('bob', transport);
+    const peer = await room.createPeer('bob', transport);
   }
   else
   {
