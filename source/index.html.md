@@ -187,7 +187,7 @@ When <code>stop()</code> is called, the underlying Node.js <code>http.Server</co
 Event fired when a WebSocket client attempts to connect to the WebSocket server.
 
 ```javascript
-server.on('connectionrequest', async (info, accept, reject) =>
+server.on('connectionrequest', (info, accept, reject) =>
 {
   // The app inspects the `info` object and decides whether to accept the
   // connection or not.  
@@ -196,7 +196,7 @@ server.on('connectionrequest', async (info, accept, reject) =>
     const transport = accept();
 
     // The app chooses a `peerId` and creates a peer within a specific room.
-    const peer = await room.createPeer('bob', transport);
+    const peer = room.createPeer('bob', transport);
   }
   else
   {
@@ -268,12 +268,12 @@ for (let peer of room.peers)
 Boolean indicating whether the room is closed.
 
 
-#### `async createPeer(peerId, transport)`
+#### `createPeer(peerId, transport)`
 
-Creates a `Peer` within this room. It resolves to the `Peer` instance. It rejects if wrong parameters are given or if there is already a peer with the same `peerId` in the room.
+Creates a `Peer` within this room. It returns a `Peer` instance. It throws if wrong parameters are given or if there is already a peer with the same `peerId` in the room.
 
 ```javascript
-const peer = await room.createPeer('alice', transport);
+const peer = room.createPeer('alice', transport);
 ```
 
 Parameter    | Description
